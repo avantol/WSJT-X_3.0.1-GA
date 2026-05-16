@@ -1013,7 +1013,7 @@ endif ()
 # Boost
 #
 if (WIN32)
-  set (Boost_USE_STATIC_LIBS OFF)
+  set (Boost_USE_STATIC_LIBS ON)   # avt 5/16/26 static link so bare wsjtx.exe runs without Boost DLLs
 endif ()
 find_package (Boost 1.62 REQUIRED COMPONENTS log_setup log)
 
@@ -1227,7 +1227,7 @@ query_qmake (QT_HOST_DATA QT_DATA_DIR)
 set (QT_MKSPECS_DIR ${QT_DATA_DIR}/mkspecs)
 
 # project definitions
-add_definitions (-DQT5 -DCMAKE_BUILD -DBIGSYM=1 -DBOOST_ALL_DYN_LINK)
+add_definitions (-DQT5 -DCMAKE_BUILD -DBIGSYM=1)   # avt 5/16/26 removed -DBOOST_ALL_DYN_LINK; Boost is now statically linked
 if (CMAKE_HOST_UNIX)
   add_definitions (-DUNIX)
 elseif (CMAKE_HOST_WIN32)
