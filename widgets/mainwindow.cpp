@@ -13276,6 +13276,7 @@ void MainWindow::replyToCQ (QTime time, qint32 snr, float delta_time, quint32 de
     .arg (delta_frequency, 4)
     .arg (mode, -2)
     .arg (text);
+  LOG_INFO(QString("replyToCQ: msg is %1").arg(message_line));
   QTextCursor start {ui->decodedTextBrowser->document ()};
   start.movePosition (QTextCursor::End);
   auto cursor = ui->decodedTextBrowser->document ()->find (message_line, start, QTextDocument::FindBackward);
@@ -13290,8 +13291,9 @@ void MainWindow::replyToCQ (QTime time, qint32 snr, float delta_time, quint32 de
                                                           .arg (mode, -2)
                                                           .arg (text), start, QTextDocument::FindBackward);
     }
-  if ((m_specOp==SpecOp::FOX && m_config.superFox()) || !cursor.isNull ())    //avt 5/15/26 allow any call if superfox 
+  if ((m_specOp==SpecOp::HOUND && m_config.superFox()) || !cursor.isNull ())    //avt 5/15/26 allow any call if superfox 
     {
+      LOG_INFO(QString("replyToCQ: msg acceptable"));
       if (m_config.udpWindowToFront ())
         {
           show ();
@@ -13304,15 +13306,18 @@ void MainWindow::replyToCQ (QTime time, qint32 snr, float delta_time, quint32 de
           raise ();
         }
       if ((text.contains (QRegularExpression {R"(^(CQ |CQDX |QRZ ))"}))
-          || text.contains("73 ") || (ui->cbHoldTxFreq->isChecked ())) {
+          || text.contains("73 ") || (ui->cbHoldTxFreq->isChecked ())
+          || (m_specOp==SpecOp::HOUND && m_config.superFox())) {   //avt 5/15/26
         // a message we are willing to accept and auto reply to
         m_bDoubleClicked = true;
       }
+      LOG_INFO(QString("replyToCQ: m_bDoubleClicked: %1").arg(m_bDoubleClicked));
       DecodedText message {message_line};
       Qt::KeyboardModifiers kbmod {modifiers << 24};
       processMessage (message, kbmod);
       tx_watchdog (false);
       QApplication::alert (this);
+      LOG_INFO(QString("replyToCQ: msg processed"));
     }
   else
     {
